@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>CRUD Operations</h1>
+    <div>
+        <h2>Create</h2>
+        user name:<input type="text" id="user_name" name="user_name">
+        password:<input type="password" id="password" name="password">
+        age:<input type="number" id="age" name="age">
+        <button onclick="addUser()">Create</button>
+    </div>
+
+    <div>
+        <h2>Upload File</h2>
+        <input type="file" id="fileInput">
+        <button onclick="uploadFile()">Upload</button>
+    </div>
+
+
+
+    <div>
+        <h2>update</h2>
+        user ID:<input type="text" id="userid">
+        user name:<input type="text" id="username">
+        <button onclick="updateUser()">Update</button>
+    </div>
+
+    <div>
+        <h2>Delete</h2>
+        user ID:<input type="text" id="id">
+        <button onclick="deleteUser()">Delete</button>
+    </div>
+
+    <div>
+        <h2>Users List</h2>
+        <div id="users-list"></div>
+        <button onclick="displayUsers()">Refresh Users List</button>
+    </div>
+
+    <div>
+        <h2>Files List</h2>
+        <div id="files-list"></div>
+        <button onclick="displayFiles()">Refresh Files List</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const API_URL = "http://127.0.0.1:8000"
+
+        const addUser = async () =>{
+            const user_name = document.getElementById('user_name').value;
+            const age = document.getElementById('age').value;
+            const password = document.getElementById('password').value;
+            axios.post(`${API_URL}/create`, { user_name: user_name, age: age, password: password })
+            console.log(user_name, age, password);
+            
+        }
+        const displayUsers = async () =>{
+            axios.get(`${API_URL}/read`).then(response => {
+                const users = response.data;
+                let usersList = '<ul>';
+                users.forEach(user => {
+                    usersList += `<li>ID: ${user.id}, Name: ${user.user_name}, Age: ${user.age}</li>`;
+                });
+                usersList += '</ul>';
+                document.body.innerHTML += usersList;
+            })
+            .catch(error => {
+                console.error('There was an error fetching the users!', error);
+            });
+
+        }
+        const updateUser = async () => {
+            const id = document.getElementById('userid').value;
+            axios.put(`${API_URL}/update/${id}`,{user_name : username.value})
+        }
+        const deleteUser = async () => {
+            const id = document.getElementById('id').value;
+            axios.delete(`${API_URL}/delete/${id}`)
+            console.log(id);
+            displayUsers();
+        }
+
+        const uploadFile = async () => {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            axios.post(`${API_URL}/upload`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            .then(response => {
+                console.log('File uploaded successfully', response.data);
+            })
+            .catch(error => {
+                console.error('There was an error uploading the file!', error);
+            });
+        }
+
+    const displayFiles = async () => {
+        axios.get(`${API_URL}/files`).then(response => {
+            const files = response.data;
+            console.log('Files:', files);
+            let filesList = '<ul>';
+            files.forEach(file => {
+                if (file.file_url) {
+                    filesList += `<li><img src="${file.file_url}" style="max-width: 200px;"></li>`;
+                } else {
+                    filesList += `<li>File URL not available for file: ${file.file_name}</li>`;
+                }
+            });
+            filesList += '</ul>';
+            document.getElementById('files-list').innerHTML = filesList;
+        })
+        .catch(error => {
+            console.error('There was an error fetching the files!', error);
+        });
+    }
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h2>Login</h2>
+    user name:<input type="text" id="username">
+    password:<input type="password" id="password">
+    <button type="button" onclick="login()">Login</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const API_URL = "http://127.0.0.1:8000"
+
+        const login = async () => {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    console.log(username, password);
+
+    axios.post(`${API_URL}/login`, {
+        user_name: username, 
+        password: password
+    })
+    .then(response => {
+        console.log('Backend response:', response.data); 
+        
+        const accessToken = response.data.access_token; 
+        if (accessToken) {
+            localStorage.setItem('access_token', accessToken);
+            console.log('Login successful');
+        window.location.href = 'index.html';
+    } else {
+            console.error('Access token not found in response');
+        }
+    })
+    .catch(error => {
+        console.error('Error logging in', error);
+    });
+};
+    </script>
+
+</body>
+</body>
+</html>

@@ -122,9 +122,9 @@ async def login(request: Request, db: Session = Depends(get_db)):
             return JSONResponse(content={"access_token": access_token}, status_code=200)
         return {"message": "Invalid Password"}
 
-@app.get("/protected-route")
-async def protected_route(current_user: User = Depends(get_current_user)):
-    return {"message": f"Hello, {current_user.user_name}"}
+# @app.get("/protected-route")
+# async def protected_route(current_user: User = Depends(get_current_user)):
+#     return {"message": f"Hello, {current_user.user_name}"}
    
 
 @app.get("/") 
